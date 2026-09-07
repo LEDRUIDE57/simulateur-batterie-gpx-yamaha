@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#17324d">
+  <meta name="description" content="Simulateur Batterie GPX Yamaha - Mode Standard V1">
+  <meta name="application-name" content="Simulateur Batterie GPX Yamaha">
+  <title>Simulateur Batterie GPX Yamaha</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <div class="eyebrow">YAMAHA · VTTAE · MODE STANDARD V1</div>
+      <h1>Simulateur Batterie GPX Yamaha</h1>
+    </div>
+    <div class="header-badges">
+      <div class="version-pill" id="appVersion">V1.2.1</div>
+      <div class="status-pill" id="appStatus">Prêt</div>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="Navigation principale">
+    <button class="tab active" data-screen="gpx">GPX</button>
+    <button class="tab" data-screen="settings">Paramètres</button>
+    <button class="tab" data-screen="results">Résultats</button>
+  </nav>
+
+  <main>
+    <section id="screen-gpx" class="screen active">
+      <div class="hero-card">
+        <div>
+          <div class="section-kicker">PARCOURS YAMAHA</div>
+          <h2>Charger un fichier GPX</h2>
+          <p>Le GPX est traité localement dans le navigateur. Aucune donnée du parcours n'est envoyée sur Internet.</p>
+        </div>
+        <label class="primary-button file-button">
+          Choisir un GPX
+          <input id="gpxInput" type="file" accept=".gpx,application/gpx+xml,application/xml,text/xml" hidden>
+        </label>
+      </div>
+
+      <div id="gpxEmpty" class="empty-state">
+        <div class="empty-icon">⌁</div>
+        <h3>Aucun parcours chargé</h3>
+        <p>Choisis un fichier <strong>.gpx</strong> contenant une trace et des altitudes.</p>
+      </div>
+
+      <div id="gpxLoaded" class="hidden">
+        <div class="card">
+          <div class="card-title-row">
+            <div>
+              <div class="section-kicker">FICHIER CHARGÉ</div>
+              <h2 id="fileName">—</h2>
+            </div>
+            <button id="reanalyzeBtn" class="secondary-button">Recalculer</button>
+          </div>
+          <div class="metrics four" id="gpxMetrics"></div>
+        </div>
+        <div id="gpxWarning" class="notice warning hidden"></div>
+        <div class="notice">
+          Le calcul produit toujours <strong>deux scénarios séparés</strong> : 1) sans recharge ; 2) avec plein à 100 % au kilomètre calculé automatiquement.
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-settings" class="screen">
+      <div class="card">
+        <div class="card-title-row">
+          <div>
+            <div class="section-kicker">RÉGLAGES YAMAHA</div>
+            <h2>Paramètres du simulateur</h2>
+          </div>
+          <button id="resetSettingsBtn" class="secondary-button danger-lite">Valeurs Yamaha / Excel V1</button>
+        </div>
+
+        <div class="settings-grid">
+          <div class="settings-group active-settings">
+            <h3>Batterie et découpage</h3>
+            <label>Capacité batterie <span>Wh</span><input data-setting="batteryCapacityWh" type="number" min="1" step="1"></label>
+            <label>Longueur tronçon <span>km</span><input data-setting="segmentLengthKm" type="number" min="0.01" step="0.1"></label>
+            <label>Seuil alerte graphique <span>Wh</span><input data-setting="batteryCriticalWh" type="number" min="0" step="1"></label>
+          </div>
+
+          <div class="settings-group active-settings">
+            <h3>Modes d'assistance</h3>
+            <label>Seuil Turbo <span>m D+ / tronçon</span><input data-setting="turboElevationThresholdM" type="number" min="0" step="1"></label>
+            <label>Vitesse Tour <span>km/h</span><input data-setting="tourSpeedKmh" type="number" min="0.1" step="0.1"></label>
+            <label>Vitesse Turbo <span>km/h</span><input data-setting="turboSpeedKmh" type="number" min="0.1" step="0.1"></label>
+          </div>
+
+          <div class="settings-group active-settings">
+            <h3>Consommation</h3>
+            <label>Conso Turbo <span>Wh/km</span><input data-setting="turboConsumptionWhPerKm" type="number" min="0" step="0.1"></label>
+            <label>Conso Tour <span>Wh/km</span><input data-setting="toursConsumptionWhPerKm" type="number" min="0" step="0.1"></label>
+            <label>Coefficient montée <span>Wh/m</span><input data-setting="climbCoefficientWhPerM" type="number" min="0" step="0.01"></label>
+            <label>Correction moteur <span>×</span><input data-setting="motorCorrection" type="number" min="0.0001" step="0.0001"></label>
+          </div>
+
+          <div class="settings-group recharge-settings">
+            <h3>Recharge déjeuner</h3>
+            <label>Capacité de recharge <span>Wh</span><input data-setting="rechargeWh" type="number" min="0" step="1"></label>
+            <div class="settings-note">
+              Référence Yamaha V1 : <strong>200 Wh</strong>. L'application place automatiquement la recharge au point où cette énergie consommée permet de refaire le plein à <strong>100 %</strong>. Si moins de 200 Wh sont consommés sur tout le parcours, le plein est placé à l'arrivée avec seulement l'énergie nécessaire.
+            </div>
+          </div>
+
+          <div class="settings-group reference-settings wide-group">
+            <div class="reference-head">
+              <h3>Informations de référence</h3>
+              <span>n'interviennent pas dans la formule Standard V1</span>
+            </div>
+            <div class="reference-grid">
+              <label>Poids vélo <span>kg</span><input data-setting="bikeWeightKg" type="number" min="0" step="0.1"></label>
+              <label>Poids cycliste <span>kg</span><input data-setting="riderWeightKg" type="number" min="0" step="0.1"></label>
+              <label>Charge transportée <span>kg</span><input data-setting="cargoWeightKg" type="number" min="0" step="0.1"></label>
+              <label>Tension batterie <span>V</span><input data-setting="batteryVoltageV" type="number" min="0.1" step="0.1"></label>
+              <label>Vitesse moyenne <span>km/h</span><input data-setting="averageSpeedKmh" type="number" min="0.1" step="0.1"></label>
+            </div>
+            <div class="settings-note">Ces champs sont conservés pour la continuité avec la feuille Excel Yamaha historique et pour de futures extensions. Les modifier ne change pas le résultat énergétique de la V1 Standard.</div>
+          </div>
+        </div>
+
+        <div class="settings-actions">
+          <span id="settingsSaved" class="save-message"></span>
+          <button id="saveSettingsBtn" class="primary-button">Enregistrer les paramètres</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-results" class="screen">
+      <div id="resultsEmpty" class="empty-state">
+        <div class="empty-icon">▥</div>
+        <h3>Pas encore de résultat</h3>
+        <p>Charge d'abord un fichier GPX dans l'onglet <strong>GPX</strong>.</p>
+      </div>
+
+      <div id="resultsContent" class="hidden">
+        <div class="card result-summary">
+          <div class="card-title-row">
+            <div>
+              <div class="section-kicker">PARCOURS ANALYSÉ</div>
+              <h2 id="resultFileName">—</h2>
+            </div>
+            <div class="mode-badge">Yamaha · Standard V1</div>
+          </div>
+          <div class="metrics four" id="routeMetrics"></div>
+        </div>
+
+        <section class="scenario scenario-one">
+          <div class="scenario-header"><div class="scenario-number">1</div><div><div class="section-kicker">RÉSULTAT 1</div><h2>Sans recharge</h2></div></div>
+          <div class="card scenario-result-card"><div class="metrics four" id="noRechargeMetrics"></div><div id="noRechargeStatus" class="scenario-note"></div></div>
+          <div class="card chart-card">
+            <div class="chart-heading">
+              <div><div class="section-kicker">GRAPHIQUE 1</div><h2>Parcours complet sans recharge</h2></div>
+              <div class="legend"><span><i class="dplus"></i>D+</span><span><i class="tour"></i>Tour</span><span><i class="turbo"></i>Turbo</span><span class="battery-scale-label">Batterie :</span><span><i class="battery-green"></i>&gt; 20 %</span><span><i class="battery-yellow"></i>20–10 %</span><span><i class="battery-red"></i>&lt; 10 %</span></div>
+            </div>
+            <div class="chart-scroll"><canvas id="chartNoRecharge" height="370"></canvas></div>
+          </div>
+        </section>
+
+        <section class="scenario scenario-two">
+          <div class="scenario-header"><div class="scenario-number">2</div><div><div class="section-kicker">RÉSULTAT 2</div><h2>Avec recharge jusqu'au plein</h2></div></div>
+          <div class="card scenario-result-card recharge-card"><div id="rechargeRule" class="recharge-rule"></div><div class="metrics six" id="withRechargeMetrics"></div><div id="withRechargeStatus" class="scenario-note"></div></div>
+          <div class="card chart-card">
+            <div class="chart-heading">
+              <div><div class="section-kicker">GRAPHIQUE 2</div><h2>Parcours complet avec plein à 100 %</h2></div>
+              <div class="legend"><span><i class="dplus"></i>D+</span><span><i class="tour"></i>Tour</span><span><i class="turbo"></i>Turbo</span><span class="battery-scale-label">Batterie :</span><span><i class="battery-green"></i>&gt; 20 %</span><span><i class="battery-yellow"></i>20–10 %</span><span><i class="battery-red"></i>&lt; 10 %</span><span><i class="recharge"></i>Recharge</span></div>
+            </div>
+            <div class="chart-scroll"><canvas id="chartWithRecharge" height="370"></canvas></div>
+          </div>
+        </section>
+
+        <div class="card">
+          <div class="card-title-row"><div><div class="section-kicker">DÉTAIL COMPARATIF</div><h2>Tronçons</h2></div><button id="csvBtn" class="secondary-button">Exporter CSV</button></div>
+          <div class="table-wrap"><table><thead><tr><th>N°</th><th>Km début</th><th>Km fin</th><th>Dist.</th><th>D+</th><th>Mode</th><th>Conso</th><th>Cumul</th><th>Restant sans recharge</th><th>Restant avec recharge</th></tr></thead><tbody id="segmentsBody"></tbody></table></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer><strong>Simulateur Batterie GPX Yamaha</strong><br>Mode Standard V1 · branche Yamaha indépendante de la version Bosch.</footer>
+
+  <script src="simulator-core.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

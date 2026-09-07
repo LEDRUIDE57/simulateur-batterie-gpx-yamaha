@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Yamaha Smoke Test" xmlns="http://www.topografix.com/GPX/1/1">
+  <trk><name>Yamaha Smoke</name><trkseg>
+    <trkpt lat="0" lon="0"><ele>100</ele></trkpt>
+    <trkpt lat="0" lon="0.004496608"><ele>105</ele></trkpt>
+    <trkpt lat="0" lon="0.008993216"><ele>130</ele></trkpt>
+    <trkpt lat="0" lon="0.013489824"><ele>132</ele></trkpt>
+    <trkpt lat="0" lon="0.017986432"><ele>160</ele></trkpt>
+  </trkseg></trk>
+</gpx>
