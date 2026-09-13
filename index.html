@@ -4,12 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#17324d">
+  <meta name="color-scheme" content="light">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Yamaha GPX">
+  <meta name="format-detection" content="telephone=no">
   <meta name="description" content="Simulateur Batterie GPX Yamaha - Mode Standard V1">
   <meta name="application-name" content="Simulateur Batterie GPX Yamaha">
   <title>Simulateur Batterie GPX Yamaha</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -19,7 +24,8 @@
       <h1>Simulateur Batterie GPX Yamaha</h1>
     </div>
     <div class="header-badges">
-      <div class="version-pill" id="appVersion">V1.2.1</div>
+      <div class="platform-pill">iPhone · iOS</div>
+      <div class="version-pill" id="appVersion">V1.2.3</div>
       <div class="status-pill" id="appStatus">Prêt</div>
     </div>
   </header>
@@ -40,14 +46,21 @@
         </div>
         <label class="primary-button file-button">
           Choisir un GPX
-          <input id="gpxInput" type="file" accept=".gpx,application/gpx+xml,application/xml,text/xml" hidden>
+          <input id="gpxInput" type="file" hidden>
         </label>
+      </div>
+
+      <div id="iosInstallNotice" class="notice ios-install hidden" role="status">
+        <strong>Installation iPhone :</strong> ouvre ce site dans Safari, touche <strong>Partager</strong> puis <strong>Sur l’écran d’accueil</strong>. Sur iOS 26 ou plus récent, laisse <strong>Ouvrir comme app web</strong> activé.
+      </div>
+      <div id="iosAppNotice" class="notice ios-app-active hidden" role="status">
+        <strong>Mode application iPhone actif.</strong> Le simulateur peut être utilisé depuis l’écran d’accueil, y compris hors connexion après un premier chargement en ligne.
       </div>
 
       <div id="gpxEmpty" class="empty-state">
         <div class="empty-icon">⌁</div>
         <h3>Aucun parcours chargé</h3>
-        <p>Choisis un fichier <strong>.gpx</strong> contenant une trace et des altitudes.</p>
+        <p>Choisis un fichier <strong>.gpx</strong> contenant une trace et des altitudes. Sur iPhone, tous les fichiers restent visibles afin que les GPX Komoot/iCloud ne soient pas grisés par iOS.</p>
       </div>
 
       <div id="gpxLoaded" class="hidden">

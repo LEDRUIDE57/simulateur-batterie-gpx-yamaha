@@ -1,44 +1,48 @@
-SIMULATEUR BATTERIE GPX YAMAHA — WEB/PWA V1.2.1
-================================================
+SIMULATEUR BATTERIE GPX YAMAHA - WEB/PWA V1.2.3 iPHONE
+=======================================================
 
 BRANCHE
 - Version Yamaha uniquement.
 - Totalement séparée de la branche Bosch / eBike Flow.
-- Le moteur Standard V1 reste fondé sur les paramètres Yamaha/Excel de référence.
+- Cible mobile officielle : iPhone / iOS. Android n'est pas la plateforme visée ni testée pour cette version.
+- Le moteur Standard V1 reste strictement identique à la V1.2.1 validée.
+- Correctif iPhone V1.2.3 : le sélecteur Fichiers n’utilise plus de filtre MIME/extension iOS, car celui-ci grisait certains GPX (notamment Komoot/iCloud). La validation .gpx est désormais faite dans l’application après sélection.
 
-TEST IMMÉDIAT SUR PC
-1. Décompresser le dossier.
-2. Double-cliquer sur index.html.
-3. Cliquer sur « Choisir un GPX ».
-4. Le fichier est lu localement par le navigateur.
+INSTALLATION SUR IPHONE
+1. Ouvrir dans Safari : https://ledruide57.github.io/simulateur-batterie-gpx-yamaha/
+2. Toucher le bouton Partager.
+3. Choisir « Sur l'écran d'accueil ».
+4. Sur iOS 26 ou plus récent, laisser « Ouvrir comme app web » activé.
+5. Lancer ensuite « Yamaha GPX » depuis l'écran d'accueil.
+6. Faire un premier lancement en ligne afin que les fichiers de l'application soient mis en cache pour le mode hors connexion.
 
-DEUX SCÉNARIOS OBLIGATOIRES
-1. Sans recharge : résultat final + graphique complet.
-2. Avec recharge : plein à 100 % placé automatiquement au point où l'énergie rechargeable disponible a été consommée.
-   Valeur de référence : 200 Wh.
+ADAPTATIONS IPHONE V1.2.3
+- métadonnées Apple Web App ajoutées ;
+- icône Apple Touch 180 x 180 dédiée ;
+- zones sûres iPhone (encoche / Dynamic Island / barre d'accueil) prises en compte ;
+- contrôles tactiles d'au moins 44 px et champs numériques à 16 px pour éviter le zoom Safari ;
+- message d'installation iPhone affiché dans Safari tant que l'app n'est pas lancée depuis l'écran d'accueil ;
+- export CSV via la feuille de partage iOS quand elle est disponible ;
+- sélecteur Fichiers iOS sans filtre `accept`, afin que les GPX ne soient plus grisés ;
+- contrôle interne du suffixe `.gpx` après sélection ;
+- cache service worker spécifique `sim-batterie-gpx-yamaha-v1-2-3-iphone`.
 
-MOTEUR STANDARD YAMAHA V1
-- Haversine : rayon 6371 km.
-- Découpage : fermeture d'un tronçon lorsque la distance cumulée atteint ou dépasse le seuil.
-- Avant calcul : distance arrondie à 2 décimales, D+ à l'entier (arrondi bancaire / half-even).
-- Mode Turbo si D+ du tronçon >= seuil Turbo ; sinon Tour.
-- Consommation = [distance × consommation corrigée par la vitesse + D+ × coefficient montée] × correction moteur.
-- Les champs poids / tension / vitesse moyenne sont conservés comme références historiques ; ils ne participent pas à la formule Standard V1.
-- Deux segments <trkseg> GPX distincts ne sont jamais reliés artificiellement.
+UTILISATION
+- « Choisir un GPX » ouvre le sélecteur de fichiers iOS.
+- Le GPX est traité localement sur l'iPhone.
+- Les deux scénarios Yamaha restent obligatoires : sans recharge et avec recharge jusqu'au plein.
 
 COULEURS BATTERIE
 - > 20 % : vert.
 - 20 % à 10 % inclus : jaune.
 - < 10 % : rouge.
-- Le seuil d'alerte en Wh est une ligne graphique indépendante et paramétrable.
 
-PWA / GITHUB PAGES
-- Pour l'installation PWA, servir le dossier en HTTPS (par exemple GitHub Pages).
-- Le service worker est versionné spécifiquement Yamaha : sim-batterie-gpx-yamaha-v1-2-1.
-- Le fichier .nojekyll est fourni pour un hébergement GitHub Pages simple.
+MOTEUR STANDARD YAMAHA V1
+- Aucune formule énergétique n'a été modifiée dans cette mise à jour iPhone.
+- Deux segments <trkseg> GPX distincts ne sont jamais reliés artificiellement.
+- Recharge de référence : 200 Wh.
 
-FICHIERS DE CONTRÔLE
-- AUDIT-YAMAHA-V1.2.0.md : audit initial de la version reçue et corrections V1.2.0.
-- TESTS-YAMAHA-V1.2.1.md : protocole et résultats des tests.
-- tests/test-core.js : tests automatiques Node du moteur.
-- PROMPT-MAITRE-YAMAHA.md : prompt de passation pour les futures évolutions.
+PUBLICATION
+- Site : https://ledruide57.github.io/simulateur-batterie-gpx-yamaha/
+- Dépôt : LEDRUIDE57/simulateur-batterie-gpx-yamaha
+- Publier le contenu du dossier à la racine de la branche `principal`, puis GitHub Pages depuis `/(racine)`.

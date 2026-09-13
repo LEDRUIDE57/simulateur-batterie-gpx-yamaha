@@ -1,0 +1,27 @@
+const fs=require('fs');
+const path=require('path');
+const root=path.resolve(__dirname,'..');
+const read=f=>fs.readFileSync(path.join(root,f),'utf8');
+function assert(ok,msg){if(!ok) throw new Error(msg); console.log('OK - '+msg);}
+const html=read('index.html');
+const manifest=JSON.parse(read('manifest.webmanifest'));
+const sw=read('sw.js');
+const css=read('styles.css');
+const app=read('app.js');
+assert(html.includes('apple-mobile-web-app-capable'), 'meta Apple Web App présente');
+assert(html.includes('apple-mobile-web-app-status-bar-style'), 'style barre iOS présent');
+assert(html.includes('icons/icon-180.png'), 'apple-touch-icon 180 déclarée');
+assert(fs.existsSync(path.join(root,'icons/icon-180.png')), 'icône 180 existe');
+assert(manifest.display==='standalone', 'manifest standalone');
+assert(manifest.start_url==='./', 'start_url compatible GitHub Pages');
+assert(manifest.icons.some(i=>i.sizes==='180x180'), 'manifest contient icône 180');
+assert(sw.includes('sim-batterie-gpx-yamaha-v1-2-3-iphone'), 'cache iPhone versionné');
+assert(sw.includes('icon-180.png'), 'icône iPhone précachée');
+assert(css.includes('safe-area-inset-top') && css.includes('safe-area-inset-bottom'), 'safe areas iPhone prises en charge');
+assert(app.includes("const APP_VERSION='1.2.3'"), 'version application V1.2.3');
+assert(app.includes('navigator.standalone') && app.includes('display-mode: standalone'), 'mode standalone iPhone détecté');
+assert(app.includes('navigator.share') && app.includes('navigator.canShare'), 'export CSV partage iOS prévu');
+assert(/id="gpxInput"[^>]*type="file"[^>]*hidden/.test(html), 'champ GPX présent');
+assert(!/id="gpxInput"[^>]*accept=/.test(html), 'aucun filtre accept iOS sur le sélecteur GPX');
+assert(app.includes("/\\.gpx$/i.test(file.name"), 'validation .gpx faite dans l’application');
+console.log('Tests PWA iPhone terminés.');

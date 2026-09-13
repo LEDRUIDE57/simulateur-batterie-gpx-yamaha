@@ -1,7 +1,7 @@
 'use strict';
 
 const Core=window.YamahaSimulatorCore;
-const APP_VERSION='1.2.1';
+const APP_VERSION='1.2.3';
 const STORAGE_KEY='simulateur-batterie-gpx-yamaha-v1-settings';
 const LEGACY_STORAGE_KEY='simulateur-batterie-gpx-web-v1-settings';
 let settings=loadSettings();
@@ -16,6 +16,17 @@ const fr=(n,d=1)=>Number(n).toLocaleString('fr-FR',{minimumFractionDigits:d,maxi
 const fr0=n=>fr(n,0);
 const fr1=n=>fr(n,1);
 const fr2=n=>fr(n,2);
+const isIPhone=/iPhone/i.test(navigator.userAgent);
+const isStandalone=()=>window.matchMedia?.('(display-mode: standalone)').matches || navigator.standalone===true;
+
+function updateIPhoneUi(){
+  document.documentElement.classList.toggle('is-iphone',isIPhone);
+  document.documentElement.classList.toggle('is-standalone',isStandalone());
+  const install=$('#iosInstallNotice');
+  const active=$('#iosAppNotice');
+  if(install) install.classList.toggle('hidden',!(isIPhone&&!isStandalone()));
+  if(active) active.classList.toggle('hidden',!(isIPhone&&isStandalone()));
+}
 
 function loadSettings(){
   try{
@@ -108,6 +119,9 @@ $('#gpxInput').addEventListener('change',async e=>{
   if(!file) return;
   setStatus('Lecture GPX…');
   try{
+    if(!/\.gpx$/i.test(file.name||'')){
+      throw new Error('Ce fichier n’est pas un GPX. Choisis un fichier dont le nom se termine par .gpx.');
+    }
     gpxName=file.name;
     const parsed=parseGpx(await file.text());
     gpxPoints=parsed.points;
@@ -372,7 +386,7 @@ function drawEmptyCanvas(canvas,msg){
   const c=canvas.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);c.fillStyle='#65717d';c.font='15px system-ui';c.fillText(msg,20,50);
 }
 
-$('#csvBtn').addEventListener('click',()=>{
+$('#csvBtn').addEventListener('click',async()=>{
   if(!simulation) return;
   const re=simulation.recharge;
   const rows=[['N°','Km début','Km fin','Distance km','D+ m','Mode','Conso Wh','Cumul Wh','Restant sans recharge Wh','Restant avec recharge Wh']];
@@ -381,14 +395,34 @@ $('#csvBtn').addEventListener('click',()=>{
     re.enabled?Core.roundHalfEven(re.batteryAfterSegment(i),1):''
   ]));
   const csv='\ufeff'+rows.map(row=>row.map(v=>`"${String(v).replaceAll('"','""')}"`).join(';')).join('\r\n');
+  const fileName=(gpxName||'simulation-yamaha').replace(/\.gpx$/i,'')+'-simulation-yamaha.csv';
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+
+  if(isIPhone && navigator.share && typeof File==='function'){
+    const shareFile=new File([blob],fileName,{type:'text/csv'});
+    try{
+      if(!navigator.canShare || navigator.canShare({files:[shareFile]})){
+        await navigator.share({files:[shareFile],title:'Simulation Batterie GPX Yamaha'});
+        return;
+      }
+    }catch(err){
+      if(err?.name==='AbortError') return;
+      console.warn('Partage iPhone indisponible, téléchargement classique utilisé.',err);
+    }
+  }
+
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
-  a.download=(gpxName||'simulation-yamaha').replace(/\.gpx$/i,'')+'-simulation-yamaha.csv';
+  a.href=URL.createObjectURL(blob);
+  a.download=fileName;
+  document.body.appendChild(a);
   a.click();
+  a.remove();
   setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 });
 
 window.addEventListener('resize',()=>{if(simulation&&$('#screen-results').classList.contains('active')) renderCharts();});
 $('#appVersion').textContent=`V${APP_VERSION}`;
+updateIPhoneUi();
+window.matchMedia?.('(display-mode: standalone)').addEventListener?.('change',updateIPhoneUi);
 fillSettings();
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});

@@ -1,7 +1,7 @@
-const CACHE='sim-batterie-gpx-yamaha-v1-2-1';
+const CACHE='sim-batterie-gpx-yamaha-v1-2-3-iphone';
 const ASSETS=[
   './','./index.html','./styles.css','./simulator-core.js','./app.js','./manifest.webmanifest',
-  './icons/icon.svg','./icons/icon-192.png','./icons/icon-512.png'
+  './icons/icon.svg','./icons/icon-180.png','./icons/icon-192.png','./icons/icon-512.png'
 ];
 
 self.addEventListener('install',event=>{
