@@ -1,7 +1,7 @@
 'use strict';
 
 const Core=window.YamahaSimulatorCore;
-const APP_VERSION='1.2.3';
+const APP_VERSION='1.2.4';
 const STORAGE_KEY='simulateur-batterie-gpx-yamaha-v1-settings';
 const LEGACY_STORAGE_KEY='simulateur-batterie-gpx-web-v1-settings';
 let settings=loadSettings();
@@ -45,12 +45,25 @@ function setStatus(text){$('#appStatus').textContent=text;}
 
 function parseGpx(text){
   const doc=new DOMParser().parseFromString(text,'application/xml');
-  if(doc.querySelector('parsererror')) throw new Error('Le fichier GPX est invalide ou illisible.');
+  const parserErrors=[...doc.getElementsByTagName('*')].filter(n=>(n.localName||'').toLowerCase()==='parsererror');
+  if(parserErrors.length) throw new Error('Le fichier GPX est invalide ou illisible.');
 
-  const trksegs=[...doc.getElementsByTagNameNS('*','trkseg')];
+  // Safari/iOS peut rencontrer des GPX avec/sans espace de noms. Pour rester
+  // compatible, on recherche par localName au lieu de dépendre d'un MIME/namespace.
+  const allElements=[...doc.getElementsByTagName('*')];
+  const byLocalName=(root,name)=>{
+    const wanted=name.toLowerCase();
+    return [...root.getElementsByTagName('*')].filter(n=>(n.localName||n.nodeName||'').toLowerCase().split(':').pop()===wanted);
+  };
+  const topByLocalName=name=>{
+    const wanted=name.toLowerCase();
+    return allElements.filter(n=>(n.localName||n.nodeName||'').toLowerCase().split(':').pop()===wanted);
+  };
+
   const points=[];
   let missingElevation=0;
   let segmentCount=0;
+  let sourceType='track';
 
   function appendNodes(nodes){
     if(nodes.length<1) return;
@@ -58,7 +71,7 @@ function parseGpx(text){
     nodes.forEach((n,index)=>{
       const lat=Number(n.getAttribute('lat'));
       const lon=Number(n.getAttribute('lon'));
-      const eleNode=[...n.children].find(c=>c.localName==='ele');
+      const eleNode=byLocalName(n,'ele')[0] || null;
       const ele=eleNode?Number(eleNode.textContent):null;
       if(!Number.isFinite(lat)||!Number.isFinite(lon)) throw new Error('Un point GPX contient des coordonnées invalides.');
       if(!Number.isFinite(ele)) missingElevation++;
@@ -66,18 +79,41 @@ function parseGpx(text){
     });
   }
 
+  // 1) GPX de type trace : <trk><trkseg><trkpt ...>
+  const trksegs=topByLocalName('trkseg');
   if(trksegs.length){
-    trksegs.forEach(seg=>appendNodes([...seg.getElementsByTagNameNS('*','trkpt')]));
+    trksegs.forEach(seg=>appendNodes(byLocalName(seg,'trkpt')));
   }else{
-    appendNodes([...doc.getElementsByTagNameNS('*','trkpt')]);
+    const trkpts=topByLocalName('trkpt');
+    if(trkpts.length) appendNodes(trkpts);
   }
 
-  if(points.length<2) throw new Error('Le GPX doit contenir au moins deux points <trkpt>.');
+  // 2) GPX de type itinéraire : <rte><rtept ...>
+  // Certains exports/partages iPhone/Komoot sont valides mais ne contiennent
+  // aucun <trkpt>. On les accepte donc sans modifier le calcul Yamaha.
+  if(points.length<2){
+    points.length=0;
+    missingElevation=0;
+    segmentCount=0;
+    sourceType='route';
+    const routes=topByLocalName('rte');
+    if(routes.length){
+      routes.forEach(route=>appendNodes(byLocalName(route,'rtept')));
+    }else{
+      const rtepts=topByLocalName('rtept');
+      if(rtepts.length) appendNodes(rtepts);
+    }
+  }
+
+  if(points.length<2){
+    const trkCount=topByLocalName('trkpt').length;
+    const rteCount=topByLocalName('rtept').length;
+    throw new Error(`Le GPX ne contient pas assez de points de parcours exploitables (trace : ${trkCount} trkpt ; itinéraire : ${rteCount} rtept).`);
+  }
   if(missingElevation===points.length) throw new Error('Le GPX ne contient aucune altitude <ele>. Le calcul du D+ Yamaha serait impossible.');
 
-  return {points,info:{pointCount:points.length,trackSegmentCount:Math.max(segmentCount,1),missingElevation}};
+  return {points,info:{pointCount:points.length,trackSegmentCount:Math.max(segmentCount,1),missingElevation,sourceType}};
 }
-
 function selectScreen(name){
   $$('.tab').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));
   $$('.screen').forEach(s=>s.classList.toggle('active',s.id===`screen-${name}`));
@@ -164,6 +200,7 @@ function analyze(){
 function renderGpxWarning(){
   const box=$('#gpxWarning');
   const msgs=[];
+  if(gpxInfo?.sourceType==='route') msgs.push('GPX de type itinéraire (<rtept>) détecté et converti automatiquement pour le calcul Yamaha.');
   if(gpxInfo?.trackSegmentCount>1) msgs.push(`${gpxInfo.trackSegmentCount} segments GPX détectés : aucune liaison artificielle n'est ajoutée entre eux.`);
   if(gpxInfo?.missingElevation>0) msgs.push(`${gpxInfo.missingElevation} point(s) sans altitude : ces transitions ne contribuent pas au D+.`);
   box.textContent=msgs.join(' ');

@@ -1,4 +1,4 @@
-SIMULATEUR BATTERIE GPX YAMAHA - WEB/PWA V1.2.3 iPHONE
+SIMULATEUR BATTERIE GPX YAMAHA - WEB/PWA V1.2.4 iPHONE
 =======================================================
 
 BRANCHE
@@ -6,7 +6,7 @@ BRANCHE
 - Totalement séparée de la branche Bosch / eBike Flow.
 - Cible mobile officielle : iPhone / iOS. Android n'est pas la plateforme visée ni testée pour cette version.
 - Le moteur Standard V1 reste strictement identique à la V1.2.1 validée.
-- Correctif iPhone V1.2.3 : le sélecteur Fichiers n’utilise plus de filtre MIME/extension iOS, car celui-ci grisait certains GPX (notamment Komoot/iCloud). La validation .gpx est désormais faite dans l’application après sélection.
+- Correctif iPhone V1.2.4 : le sélecteur Fichiers n’utilise plus de filtre MIME/extension iOS, car celui-ci grisait certains GPX (notamment Komoot/iCloud). La validation .gpx est désormais faite dans l’application après sélection.
 
 INSTALLATION SUR IPHONE
 1. Ouvrir dans Safari : https://ledruide57.github.io/simulateur-batterie-gpx-yamaha/
@@ -16,7 +16,7 @@ INSTALLATION SUR IPHONE
 5. Lancer ensuite « Yamaha GPX » depuis l'écran d'accueil.
 6. Faire un premier lancement en ligne afin que les fichiers de l'application soient mis en cache pour le mode hors connexion.
 
-ADAPTATIONS IPHONE V1.2.3
+ADAPTATIONS IPHONE V1.2.4
 - métadonnées Apple Web App ajoutées ;
 - icône Apple Touch 180 x 180 dédiée ;
 - zones sûres iPhone (encoche / Dynamic Island / barre d'accueil) prises en compte ;
@@ -46,3 +46,5 @@ PUBLICATION
 - Site : https://ledruide57.github.io/simulateur-batterie-gpx-yamaha/
 - Dépôt : LEDRUIDE57/simulateur-batterie-gpx-yamaha
 - Publier le contenu du dossier à la racine de la branche `principal`, puis GitHub Pages depuis `/(racine)`.
+
+V1.2.4 iPhone : import GPX étendu aux traces <trkpt> et itinéraires <rtept>, avec lecture XML tolérante Safari/iOS.

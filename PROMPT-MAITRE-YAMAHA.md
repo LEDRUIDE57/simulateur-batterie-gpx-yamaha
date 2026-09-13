@@ -1,6 +1,6 @@
 # PROMPT MAÎTRE DE PASSATION - SIMULATEUR BATTERIE GPX YAMAHA
 
-Version de référence : **Yamaha Web/PWA V1.2.3 iPhone**
+Version de référence : **Yamaha Web/PWA V1.2.4 iPhone**
 
 ---
 
@@ -21,7 +21,7 @@ Pour Yamaha, ne jamais reprendre automatiquement :
 
 Si une demande semble mélanger Yamaha et Bosch, conserver Yamaha inchangé et demander explicitement de traiter Bosch dans sa branche séparée si nécessaire.
 
-## 3. Fichiers de référence Yamaha V1.2.3 iPhone
+## 3. Fichiers de référence Yamaha V1.2.4 iPhone
 - `index.html` : interface ;
 - `styles.css` : présentation ;
 - `simulator-core.js` : **moteur calculatoire Yamaha** ;
@@ -110,7 +110,7 @@ Conserver ces valeurs par défaut sauf validation explicite d'une nouvelle calib
 Important : poids, tension et vitesse moyenne sont conservés pour historique mais **n'interviennent pas dans la formule Standard V1 actuelle**.
 
 ## 7. Couleurs batterie validées
-Règle Yamaha V1.2.3 iPhone à appliquer partout :
+Règle Yamaha V1.2.4 iPhone à appliquer partout :
 - > 20 % : vert ;
 - de 20 % à 10 % inclus : jaune ;
 - < 10 % : rouge.
@@ -205,3 +205,6 @@ Pour toute évolution future :
 - conserver une version livrable ZIP avant publication ;
 - après validation, publier la nouvelle version sur le même dépôt GitHub Pages ;
 - mettre à jour le numéro de version visible, le cache PWA, le changelog, les tests et ce prompt maître.
+
+## Compatibilité GPX iPhone V1.2.4
+Le lecteur GPX doit accepter les parcours définis par `<trkpt>` (trace) ou `<rtept>` (itinéraire), sans dépendre d’un namespace XML particulier. Ne jamais réintroduire un filtre iOS qui grise les fichiers GPX dans le sélecteur Fichiers.

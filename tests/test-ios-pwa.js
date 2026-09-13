@@ -15,10 +15,10 @@ assert(fs.existsSync(path.join(root,'icons/icon-180.png')), 'icône 180 existe')
 assert(manifest.display==='standalone', 'manifest standalone');
 assert(manifest.start_url==='./', 'start_url compatible GitHub Pages');
 assert(manifest.icons.some(i=>i.sizes==='180x180'), 'manifest contient icône 180');
-assert(sw.includes('sim-batterie-gpx-yamaha-v1-2-3-iphone'), 'cache iPhone versionné');
+assert(sw.includes('sim-batterie-gpx-yamaha-v1-2-4-iphone'), 'cache iPhone versionné');
 assert(sw.includes('icon-180.png'), 'icône iPhone précachée');
 assert(css.includes('safe-area-inset-top') && css.includes('safe-area-inset-bottom'), 'safe areas iPhone prises en charge');
-assert(app.includes("const APP_VERSION='1.2.3'"), 'version application V1.2.3');
+assert(app.includes("const APP_VERSION='1.2.4'"), 'version application V1.2.4');
 assert(app.includes('navigator.standalone') && app.includes('display-mode: standalone'), 'mode standalone iPhone détecté');
 assert(app.includes('navigator.share') && app.includes('navigator.canShare'), 'export CSV partage iOS prévu');
 assert(/id="gpxInput"[^>]*type="file"[^>]*hidden/.test(html), 'champ GPX présent');

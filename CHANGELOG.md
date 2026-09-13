@@ -1,3 +1,12 @@
+# V1.2.4 iPhone — 2026-09-13
+
+- Correction import GPX iPhone/Safari : prise en charge des GPX de type trace (`<trkpt>`) **et** itinéraire (`<rtept>`).
+- Lecture XML rendue plus tolérante aux variantes d’espace de noms rencontrées sous iOS.
+- Message d’erreur enrichi avec le nombre de `trkpt` et `rtept` détectés.
+- Avertissement informatif lorsqu’un GPX de type itinéraire est utilisé.
+- Aucun changement du moteur énergétique Yamaha, des paramètres ni des seuils batterie.
+- Cache PWA incrémenté en V1.2.4.
+
 # Changelog Yamaha
 
 ## V1.2.3 iPhone - 2026-09-13
